@@ -1,3 +1,4 @@
 */resources/
 */results/
 **/.snakemake/
+*/config/config.yaml
