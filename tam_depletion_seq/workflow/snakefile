@@ -1,0 +1,64 @@
+configfile: "config/config.yaml"
+
+wildcard_constraints:
+    reads="R[12]"
+
+import textwrap
+
+
+rule all:
+    input:
+        expand("results/counts/{sample}.tsv", sample=config["input"].keys())
+
+
+rule find_tam:
+    input:
+        reads = lambda wildcards: config["input"][wildcards.sample][wildcards.reads],
+    output:
+        tam = "results/tam/seperate/{sample}_{reads}.tsv.gz",
+    log:
+        cutadapt = "results/tam/seperate/{sample}_{reads}.log",
+    params:
+        upstream = config["params"]["upstream"],
+        downstream = config["params"]["downstream"],
+    conda: "env/cutadapt.yaml"
+    threads: 8
+    shell:
+        textwrap.dedent(r"""
+            cutadapt -g "{params.upstream}...{params.downstream}" {input.reads:q} --rc --rename '{{header}} rc_{{rc}}' --cores {threads} --fasta 2> {log.cutadapt:q} |
+            seqkit fx2tab -Q |
+            awk -v 'FS=[ \t]' -v 'OFS=\t' '{{
+                $3 = $3=="rc_" ? "forward" : "reverse"
+                if(length($4)!=5) {{
+                    $3 = "NA"
+                    $4 = "NA"
+                }}
+                print
+            }}' | gzip > {output:q}
+        """)
+
+
+rule merge_pairs:
+    input:
+        tam1 = "results/tam/seperate/{sample}_R1.tsv.gz",
+        tam2 = "results/tam/seperate/{sample}_R2.tsv.gz",
+    output:
+        merged = "results/tam/merged/{sample}.tsv.gz",
+        counts = "results/counts/{sample}.tsv"
+    params:
+        script = workflow.source_path("script/merge.awk"),
+    conda:
+        "env/csvtk.yaml"
+    shell:
+        textwrap.dedent(r"""
+            paste <(zcat {input.tam1:q}) <(zcat {input.tam2:q}) |
+            awk -v 'FS=\t' -v 'OFS=\t' -f {params.script:q} -e '{{
+                direction = $3==$7?"NA":$3!="NA"?$3:$7=="forward"?"reverse":"forward"
+                if (direction == "NA") {{
+                    print $1, "NA", "NA"
+                }} else {{
+                    print $1, direction, merge($4, $8)
+                }}
+            }}' | tee >(gzip > {output.merged:q}) |
+            csvtk -tH freq -f 3 -k | awk '$1~/[ATCG]{{5}}/' > {output.counts:q}
+        """)
