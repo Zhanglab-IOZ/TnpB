@@ -9,7 +9,7 @@ import textwrap
 
 rule all:
     input:
-        expand("results/logo/{is_name}.logo.tsv", is_name = config["samples"].keys()),
+        expand("results/logo/{is_name}.logo.svg", is_name = config["samples"].keys()),
 
 
 rule find_tam:
@@ -95,3 +95,12 @@ rule build_logodata:
     shell:
         "Rscript {params.script} --in-test {input.test:q} --out-logodata {output.data:q} --seed {params.seed}"
 
+
+rule plot_logo:
+    input: "results/logo/{is_name}.logo.tsv",
+    output: "results/logo/{is_name}.logo.svg"
+    conda: "env/weblogo.yaml"
+    params:
+        script = workflow.source_path("script/weblogo_plotdata.py")
+    shell:
+        "cat {input:q} | python {params.script:q} >{output:q}"

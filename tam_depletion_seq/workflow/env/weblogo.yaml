@@ -1,0 +1,7 @@
+channels:
+  - conda-forge
+dependencies:
+  - numpy=1.22
+  - pandas=1.4
+  - weblogo=3.7
+  - ghostscript=9.54.0
