@@ -3,12 +3,13 @@ configfile: "config/config.yaml"
 wildcard_constraints:
     reads="R[12]"
 
+import hashlib
 import textwrap
 
 
 rule all:
     input:
-        expand("results/counts/{sample}.tsv", sample=config["input"].keys())
+        expand("results/logo/{is_name}.logo.tsv", is_name = config["samples"].keys()),
 
 
 rule find_tam:
@@ -62,3 +63,35 @@ rule merge_pairs:
             }}' | tee >(gzip > {output.merged:q}) |
             csvtk -tH freq -f 3 -k | awk '$1~/[ATCG]{{5}}/' > {output.counts:q}
         """)
+
+
+# TODO: better handling is_names with no depleted tam
+
+rule test_depletion:
+    input:
+        control = lambda wildcards: f'results/counts/{config["samples"][wildcards.is_name]["control"]}.tsv',
+        test = lambda wildcards: f'results/counts/{config["samples"][wildcards.is_name]["test"]}.tsv',
+    output:
+        test = "results/logo/{is_name}.test.tsv",
+        plot = "results/logo/{is_name}.test.svg",
+    params:
+        script = workflow.source_path("script/tam_depletion.R"),
+    conda:
+        "env/tidyverse.yaml"
+    shell:
+        "Rscript {params.script} {input.control:q} {input.test:q} --out-test {output.test:q} --out-plot {output.plot:q}"
+
+
+rule build_logodata:
+    input:
+        test = "results/logo/{is_name}.test.tsv",
+    output:
+        data = "results/logo/{is_name}.logo.tsv",
+    params:
+        script = workflow.source_path("script/build_logo.R"),
+        seed = lambda wildcards: int(hashlib.sha256(wildcards.is_name.encode()).hexdigest()[-6:], 16)
+    conda:
+        "env/tidyverse.yaml"
+    shell:
+        "Rscript {params.script} --in-test {input.test:q} --out-logodata {output.data:q} --seed {params.seed}"
+
