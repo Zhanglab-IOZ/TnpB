@@ -1,16 +1,32 @@
 configfile: "config/config.yaml"
 
-
+import shutil
+import os
 import textwrap
-
+import pandas
 
 rule all:
     input:
-        expand(
-            "results/{genome}/flanking",
-            genome = config["input"]["genomes"].keys()
+        lambda wildcards: expand(
+            "results/flanking/{tnpb}.txt",
+            tnpb=glob_wildcards(os.path.join(checkpoints.all_genomes.get().output.outdir, "{tnpb}.fna")).tnpb
         )
 
 
 include: "rules/pfam_search.smk"
 include: "rules/tnpb_cluster.smk"
+
+
+checkpoint all_genomes:
+    input:
+        meta = expand("results/{genome}/summary.tsv", genome = config["input"]["genomes"].keys()),
+        sequences = expand("results/{genome}/flanking", genome = config["input"]["genomes"].keys()),
+    output:
+        outdir=directory("results/flanking")
+    run:
+        os.makedirs("results/flanking", exist_ok=True)
+        for meta, base in zip(input.meta, input.sequences):
+            df = pandas.read_table(meta, header=None, usecols=[0, 1, 2])
+            df.columns = ["name", "n_copy", "n_tnpa"]
+            for name in df.name[df.n_tnpa > 1]:
+                shutil.copy(f"{base}/{name}.fna", output.outdir)
