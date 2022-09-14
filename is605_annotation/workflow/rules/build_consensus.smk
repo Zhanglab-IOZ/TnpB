@@ -7,7 +7,7 @@ import textwrap
 
 rule blast:
     input:
-        copies="results/flanking/{tnpb}/flanking.fna",
+        copies="results/flanking/{tnpb}/genome/flanking/{tnpb}.fna",
     output:
         table="results/flanking/{tnpb}/blast.tsv",
     conda: "../env/blast.yaml"
@@ -18,7 +18,7 @@ rule blast:
 rule clip:
     input:
         blast=rules.blast.output.table,
-        copies="results/flanking/{tnpb}/flanking.fna",
+        copies="results/flanking/{tnpb}/genome/flanking/{tnpb}.fna",
     output:
         bed="results/flanking/{tnpb}/is.bed",
         fasta="results/flanking/{tnpb}/is.fna",

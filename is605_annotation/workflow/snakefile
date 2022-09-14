@@ -9,7 +9,7 @@ rule all:
     input:
         lambda wildcards: expand(
             "results/flanking/{tnpb}/mafft.fna",
-            tnpb=glob_wildcards(os.path.join(checkpoints.all_genomes.get().output.outdir, "{tnpb}/flanking.fna")).tnpb
+            tnpb=glob_wildcards(os.path.join(checkpoints.link_genomes.get().output.outdir, "{tnpb}/genome")).tnpb
         )
 
 
@@ -18,16 +18,18 @@ include: "rules/tnpb_cluster.smk"
 include: "rules/build_consensus.smk"
 
 
-checkpoint all_genomes:
+checkpoint link_genomes:
     input:
         meta = expand("results/{genome}/summary.tsv", genome = config["input"]["genomes"].keys()),
-        sequences = expand("results/{genome}/flanking", genome = config["input"]["genomes"].keys()),
+        flanking = expand("results/{genome}/flanking", genome = config["input"]["genomes"].keys()),
     output:
         outdir=directory("results/flanking")
+    params:
+        genomes = expand("results/{genome}", genome = config["input"]["genomes"].keys()),
     run:
-        for meta, base in zip(input.meta, input.sequences):
+        for meta, genome in zip(input.meta, params.genomes):
             df = pandas.read_table(meta, header=None, usecols=[0, 1, 2])
             df.columns = ["name", "n_copy", "n_tnpa"]
             for name in df.name[df.n_tnpa > 1]:
                 os.makedirs(f"{output.outdir}/{name}", exist_ok=True)
-                shutil.copy(f"{base}/{name}.fna", f"{output.outdir}/{name}/flanking.fna")
+                os.symlink(os.path.relpath(genome, start=f"{output.outdir}/{name}"), f"{output.outdir}/{name}/genome")
