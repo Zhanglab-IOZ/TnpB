@@ -8,13 +8,14 @@ import pandas
 rule all:
     input:
         lambda wildcards: expand(
-            "results/flanking/{tnpb}.txt",
-            tnpb=glob_wildcards(os.path.join(checkpoints.all_genomes.get().output.outdir, "{tnpb}.fna")).tnpb
+            "results/flanking/{tnpb}/mafft.fna",
+            tnpb=glob_wildcards(os.path.join(checkpoints.all_genomes.get().output.outdir, "{tnpb}/flanking.fna")).tnpb
         )
 
 
 include: "rules/pfam_search.smk"
 include: "rules/tnpb_cluster.smk"
+include: "rules/build_consensus.smk"
 
 
 checkpoint all_genomes:
@@ -24,9 +25,9 @@ checkpoint all_genomes:
     output:
         outdir=directory("results/flanking")
     run:
-        os.makedirs("results/flanking", exist_ok=True)
         for meta, base in zip(input.meta, input.sequences):
             df = pandas.read_table(meta, header=None, usecols=[0, 1, 2])
             df.columns = ["name", "n_copy", "n_tnpa"]
             for name in df.name[df.n_tnpa > 1]:
-                shutil.copy(f"{base}/{name}.fna", output.outdir)
+                os.makedirs(f"{output.outdir}/{name}", exist_ok=True)
+                shutil.copy(f"{base}/{name}.fna", f"{output.outdir}/{name}/flanking.fna")
