@@ -7,10 +7,10 @@ import textwrap
 rule all:
     input:
         expand(
-            "results/{genome}/{tnp}.bed",
-            tnp = ["tnpa", "tnpb"],
+            "results/{genome}/flanking",
             genome = config["input"]["genomes"].keys()
         )
 
 
 include: "rules/pfam_search.smk"
+include: "rules/tnpb_cluster.smk"
