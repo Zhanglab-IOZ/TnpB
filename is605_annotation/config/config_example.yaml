@@ -1,0 +1,11 @@
+input:
+  genomes:
+    902/GCF_902143525.1_P7770: resources/genomes/GCF/902/143/525/GCF_902143525.1_P7770/GCF_902143525.1_P7770_{suffix}
+    002/GCF_002368015.1_ASM236801v1: resources/genomes/GCF/002/368/015/GCF_002368015.1_ASM236801v1/GCF_002368015.1_ASM236801v1_{suffix}
+
+params:
+  pfam:
+    models: resources/pfam_models.hmm
+    rule:
+      tnpa: hhblits_full_TnpA
+      tnpb: HTH_OrfB_IS605; OrfB_IS605; OrfB_Zn_ribbon

@@ -1,0 +1,18 @@
+configfile: "config/config.yaml"
+
+
+import textwrap
+
+
+rule all:
+    input:
+        expand(
+            "results/{genome}/{file}",
+            file = ["translated_cds.faa", "genomic.fna.fai", "genomic.gff"],
+            genome = config["input"]["genomes"].keys()
+        )
+
+
+
+
+include: "rules/pfam_search.smk"
