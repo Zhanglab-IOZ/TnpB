@@ -11,7 +11,7 @@ rule all:
             "results/elements/{tnpb}/mafft.fna",
             tnpb=glob_wildcards(os.path.join(checkpoints.link_genomes.get().output.outdir, "{tnpb}/flanking"), followlinks=True).tnpb
         ),
-        "results/dedup/denovo_tnpb.faa",
+        "results/dedup/merged_rep_seq.fasta",
 
 
 include: "rules/prepare_genome.smk"
@@ -36,4 +36,3 @@ checkpoint link_genomes:
             df.columns = ["tnpb", "n_copy", "n_tnpa", "passed"]
             for tnpb in df.tnpb[df.passed == "T"]:
                 os.symlink(os.path.relpath(genome, start=f"{output.outdir}"), f"{output.outdir}/{tnpb}")
-

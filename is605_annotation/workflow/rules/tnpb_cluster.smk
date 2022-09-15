@@ -1,7 +1,7 @@
 import textwrap
 
 
-rule cluster_tnpb:
+rule cluster_tnpb_within_genome:
     input:
         fasta="results/genomes/{genome}/tnpb.faa",
     output:
@@ -29,7 +29,7 @@ rule summary_tnpb:
     input:
         tnpa="results/genomes/{genome}/tnpa.bed",
         tnpb="results/genomes/{genome}/tnpb.bed",
-        tnpb_cluster=rules.cluster_tnpb.output.table,
+        tnpb_cluster=rules.cluster_tnpb_within_genome.output.table,
     output:
         details="results/genomes/{genome}/tnpb_annot.bed",
         summary="results/genomes/{genome}/summary.tsv",
