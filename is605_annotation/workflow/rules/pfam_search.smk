@@ -35,7 +35,7 @@ rule hmmer_filter:
                 match($0, /\[locus_tag=([^[:space:]]+)\]/, arr)
                 print arr[1] "\t" $4
             }}' |
-            csvtk -tH fold -f 1 -v 2 |
+            {{ csvtk -tH fold -f 1 -v 2 || echo '#' ; }} |
             csvtk -tH join --left-join - {input.annotation:q} -f '1;12' |
             awk -v 'FS=\t' -v 'OFS=\t' '{{ print $4, $6, $7, $1, ".", $5, $2 }}' |
             sort -k1,1 -k2,2n > {output.hits:q}

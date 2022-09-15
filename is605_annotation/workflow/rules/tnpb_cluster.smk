@@ -19,9 +19,13 @@ rule cluster_tnpb_within_genome:
     threads: 8
     shell:
         textwrap.dedent(r"""
-            tmpd=$(mktemp -d -t --dry-run mmseq_XXXXXXXX)
-            mmseqs easy-cluster {input:q} {params.prefix:q} $tmpd --min-seq-id {params.identity} -c {params.coverage} --threads {threads} > {log.mmseqs2:q}
-            rm -r $tmpd
+            if [ -s {input.fasta:q} ]; then
+                tmpd=$(mktemp -d -t --dry-run mmseq_XXXXXXXX)
+                mmseqs easy-cluster {input.fasta:q} {params.prefix:q} $tmpd --min-seq-id {params.identity} -c {params.coverage} --threads {threads} > {log.mmseqs2:q}
+                rm -r $tmpd
+            else
+                touch {output:q}
+            fi
         """)
 
 
@@ -40,10 +44,10 @@ rule summary_tnpb:
             bedtools closest -a {input.tnpb:q} -b {input.tnpa:q} -d |
                 cut -f 1-7,15 |
                 awk -v 'FS=\t' -v 'OFS=\t' '{{ $8 = NF>=8 ? ($8<500 && $8!=-1) : 0 ; print }}' |
-                csvtk -tH join --left-join - {input.tnpb_cluster:q} -f "4;2" |
+                {{ csvtk -tH join --left-join - {input.tnpb_cluster:q} -f "4;2" || true; }} |
                 tee {output.details:q} |
-                csvtk -tH summary -g 9 -f '4:count,4:collapse,8:sum' --separater ' ' --decimal-width 0 |
-                csvtk -tH cut -f 1,2,4,3 |
+                {{ csvtk -tH summary -g 9 -f '4:count,4:collapse,8:sum' --separater ' ' --decimal-width 0 || true; }} |
+                cut -f 1,2,4,3 |
                 awk -v "FS=\t" -v 'OFS=\t' '{{
                     print $1, $2, $3, ($3>1)?"T":"F", $4
                 }}' > {output.summary:q}

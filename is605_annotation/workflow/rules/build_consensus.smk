@@ -31,7 +31,7 @@ rule clip:
         textwrap.dedent(r"""
             cat {input.blast:q} |
                 csvtk -tH filter2 -f ' $7 - 1 < 1500 && $2 - $8 < 1500 && $6 < 2500 ' |
-                csvtk -tH summary -g 1 -f '7:min,8:max' -n 0 |
+                {{ csvtk -tH summary -g 1 -f '7:min,8:max' -n 0 || true; }} |
                 tee {output.bed:q} |
                 bedtools getfasta -s -fi {params.copies:q} -bed - -bedOut | 
                 awk -v 'FS=\t' '{{ print ">"$1 "\n" $4 }}' >{output.fasta:q}

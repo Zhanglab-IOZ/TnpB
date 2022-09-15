@@ -1,9 +1,7 @@
 configfile: "config/config.yaml"
 
-import shutil
 import os
 import textwrap
-import pandas
 
 rule all:
     input:
@@ -32,7 +30,9 @@ checkpoint link_genomes:
     run:
         os.makedirs(f"{output.outdir}", exist_ok=True)
         for meta, genome in zip(input.meta, params.genomes):
-            df = pandas.read_table(meta, header=None, usecols=[0, 1, 2, 3])
-            df.columns = ["tnpb", "n_copy", "n_tnpa", "passed"]
-            for tnpb in df.tnpb[df.passed == "T"]:
-                os.symlink(os.path.relpath(genome, start=f"{output.outdir}"), f"{output.outdir}/{tnpb}")
+            with open(meta, "r") as df:
+                for line in df:
+                    tnpb, n_copy, n_tnpa, passed, _ = line.rstrip("\n").split("\t")
+                    if passed != "T":
+                        continue
+                    os.symlink(os.path.relpath(genome, start=f"{output.outdir}"), f"{output.outdir}/{tnpb}")
