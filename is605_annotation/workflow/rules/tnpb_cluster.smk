@@ -43,8 +43,23 @@ rule summary_tnpb:
                 csvtk -tH join --left-join - {input.tnpb_cluster:q} -f "4;2" |
                 tee {output.details:q} |
                 csvtk -tH summary -g 9 -f '4:count,4:collapse,8:sum' --separater ' ' --decimal-width 0 |
-                csvtk -tH cut -f 1,2,4,3 > {output.summary:q}
+                csvtk -tH cut -f 1,2,4,3 |
+                awk -v "FS=\t" -v 'OFS=\t' '{{
+                    print $1, $2, $3, ($3>1)?"T":"F", $4
+                }}' > {output.summary:q}
         """)
+
+
+rule filter_multi_copy:
+    input:
+        fasta="results/genomes/{genome}/tnpb.faa",
+        summary="results/genomes/{genome}/summary.tsv",
+    output:
+        filtered="results/genomes/{genome}/multi_copy.faa",
+    conda:
+        "../env/seqkit.yaml"
+    shell:
+        r""" cat {input.summary:q} | awk -v 'FS=\t' '$4=="T"{{print $1}}' | seqkit grep -f - {input.fasta:q} -o {output.filtered:q} """
 
 
 rule extract_flanking:

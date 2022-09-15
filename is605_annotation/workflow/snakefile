@@ -10,13 +10,15 @@ rule all:
         lambda wildcards: expand(
             "results/elements/{tnpb}/mafft.fna",
             tnpb=glob_wildcards(os.path.join(checkpoints.link_genomes.get().output.outdir, "{tnpb}/flanking"), followlinks=True).tnpb
-        )
+        ),
+        "results/dedup/denovo_tnpb.faa",
 
 
 include: "rules/prepare_genome.smk"
 include: "rules/pfam_search.smk"
 include: "rules/tnpb_cluster.smk"
 include: "rules/build_consensus.smk"
+include: "rules/remove_duplicate.smk"
 
 
 checkpoint link_genomes:
@@ -30,8 +32,8 @@ checkpoint link_genomes:
     run:
         os.makedirs(f"{output.outdir}", exist_ok=True)
         for meta, genome in zip(input.meta, params.genomes):
-            df = pandas.read_table(meta, header=None, usecols=[0, 1, 2])
-            df.columns = ["tnpb", "n_copy", "n_tnpa"]
-            for tnpb in df.tnpb[df.n_tnpa > 1]:
+            df = pandas.read_table(meta, header=None, usecols=[0, 1, 2, 3])
+            df.columns = ["tnpb", "n_copy", "n_tnpa", "passed"]
+            for tnpb in df.tnpb[df.passed == "T"]:
                 os.symlink(os.path.relpath(genome, start=f"{output.outdir}"), f"{output.outdir}/{tnpb}")
 
