@@ -49,6 +49,8 @@ rule match_tnp:
     output:
         bed="results/genomes/{genome}/{tnp}.bed",
         fasta="results/genomes/{genome}/{tnp}.faa",
+    wildcard_constraints:
+        tnp="tnp[ab]"
     params:
         motifs=lambda wildcards: config["params"]["pfam"]["rule"][wildcards.tnp],
     conda:
