@@ -5,7 +5,7 @@ rule prepare_genome:
     input:
         archive=lambda wildcards: config["input"]["genomes"][wildcards.genome].format(suffix = wildcards.suffix),
     output:
-        extracted=temp("results/{genome}/{suffix}"),
+        extracted=temp("results/genomes/{genome}/{suffix}"),
     wildcard_constraints:
         suffix="translated_cds.faa|genomic.gff|genomic.fna"
     shell:
@@ -14,9 +14,9 @@ rule prepare_genome:
 
 rule prepare_annotation:
     input:
-        gff = "results/{genome}/genomic.gff",
+        gff = "results/genomes/{genome}/genomic.gff",
     output:
-        genepred = temp("results/{genome}/annotation.genepred"),
+        genepred = temp("results/genomes/{genome}/annotation.genepred"),
     conda:
         "../env/gff3togenepred.yaml"
     shell:
@@ -25,9 +25,9 @@ rule prepare_annotation:
 
 rule prepare_genome_index:
     input:
-        genome="results/{genome}/genomic.fna",
+        genome="results/genomes/{genome}/genomic.fna",
     output:
-        index= temp("results/{genome}/genomic.fna.fai"),
+        index= temp("results/genomes/{genome}/genomic.fna.fai"),
     conda:
         "../env/seqkit.yaml"
     shell:

@@ -8,8 +8,8 @@ import pandas
 rule all:
     input:
         lambda wildcards: expand(
-            "results/flanking/{tnpb}/mafft.fna",
-            tnpb=glob_wildcards(os.path.join(checkpoints.link_genomes.get().output.outdir, "{tnpb}/genome")).tnpb
+            "results/elements/{tnpb}/mafft.fna",
+            tnpb=glob_wildcards(os.path.join(checkpoints.link_genomes.get().output.outdir, "{tnpb}/flanking"), followlinks=True).tnpb
         )
 
 
@@ -21,16 +21,17 @@ include: "rules/build_consensus.smk"
 
 checkpoint link_genomes:
     input:
-        meta = expand("results/{genome}/summary.tsv", genome = config["input"]["genomes"].keys()),
-        flanking = expand("results/{genome}/flanking", genome = config["input"]["genomes"].keys()),
+        meta = expand("results/genomes/{genome}/summary.tsv", genome = config["input"]["genomes"].keys()),
+        flanking = expand("results/genomes/{genome}/flanking", genome = config["input"]["genomes"].keys()),
     output:
-        outdir=directory("results/flanking")
+        outdir=directory("results/genome_links")
     params:
-        genomes = expand("results/{genome}", genome = config["input"]["genomes"].keys()),
+        genomes = expand("results/genomes/{genome}", genome = config["input"]["genomes"].keys()),
     run:
+        os.makedirs(f"{output.outdir}", exist_ok=True)
         for meta, genome in zip(input.meta, params.genomes):
             df = pandas.read_table(meta, header=None, usecols=[0, 1, 2])
-            df.columns = ["name", "n_copy", "n_tnpa"]
-            for name in df.name[df.n_tnpa > 1]:
-                os.makedirs(f"{output.outdir}/{name}", exist_ok=True)
-                os.symlink(os.path.relpath(genome, start=f"{output.outdir}/{name}"), f"{output.outdir}/{name}/genome")
+            df.columns = ["tnpb", "n_copy", "n_tnpa"]
+            for tnpb in df.tnpb[df.n_tnpa > 1]:
+                os.symlink(os.path.relpath(genome, start=f"{output.outdir}"), f"{output.outdir}/{tnpb}")
+

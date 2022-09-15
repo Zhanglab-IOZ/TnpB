@@ -3,15 +3,15 @@ import textwrap
 
 rule cluster_tnpb:
     input:
-        fasta="results/{genome}/tnpb.faa",
+        fasta="results/genomes/{genome}/tnpb.faa",
     output:
-        rep="results/{genome}/tnpb_rep_seq.fasta",
-        allseqs="results/{genome}/tnpb_all_seqs.fasta",
-        table="results/{genome}/tnpb_cluster.tsv",
+        rep="results/genomes/{genome}/tnpb_rep_seq.fasta",
+        allseqs="results/genomes/{genome}/tnpb_all_seqs.fasta",
+        table="results/genomes/{genome}/tnpb_cluster.tsv",
     log:
-        mmseqs2="results/{genome}/tnpb_mmseqs.log",
+        mmseqs2="results/genomes/{genome}/tnpb_mmseqs.log",
     params:
-        prefix="results/{genome}/tnpb",
+        prefix="results/genomes/{genome}/tnpb",
         identity=0.9,
         coverage=0.9,
     conda:
@@ -27,12 +27,12 @@ rule cluster_tnpb:
 
 rule summary_tnpb:
     input:
-        tnpa="results/{genome}/tnpa.bed",
-        tnpb="results/{genome}/tnpb.bed",
+        tnpa="results/genomes/{genome}/tnpa.bed",
+        tnpb="results/genomes/{genome}/tnpb.bed",
         tnpb_cluster=rules.cluster_tnpb.output.table,
     output:
-        details="results/{genome}/tnpb_annot.bed",
-        summary="results/{genome}/summary.tsv",
+        details="results/genomes/{genome}/tnpb_annot.bed",
+        summary="results/genomes/{genome}/summary.tsv",
     conda:
         "../env/bedtools_csvtk.yaml"
     shell:
@@ -50,10 +50,10 @@ rule summary_tnpb:
 rule extract_flanking:
     input:
         bed=rules.summary_tnpb.output.details,
-        genome="results/{genome}/genomic.fna",
-        index="results/{genome}/genomic.fna.fai",
+        genome="results/genomes/{genome}/genomic.fna",
+        index="results/genomes/{genome}/genomic.fna.fai",
     output:
-        fasta=directory("results/{genome}/flanking"),
+        fasta=directory("results/genomes/{genome}/flanking"),
     params:
         extends=1500,
     conda:

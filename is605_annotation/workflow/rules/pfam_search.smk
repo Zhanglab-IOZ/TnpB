@@ -7,12 +7,12 @@ import textwrap
 
 rule hmmer_search:
     input:
-        fasta="results/{genome}/translated_cds.faa",
+        fasta="results/genomes/{genome}/translated_cds.faa",
         profile=config["params"]["pfam"]["models"],
     output:
-        domtblout="results/{genome}/hmmer.txt",
+        domtblout="results/genomes/{genome}/hmmer.txt",
     log:
-        hmmer="results/{genome}/hmmer.log",
+        hmmer="results/genomes/{genome}/hmmer.log",
     conda:
         "../env/hmmer.yaml"
     threads: 4
@@ -25,7 +25,7 @@ rule hmmer_filter:
         hmmer=rules.hmmer_search.output.domtblout,
         annotation=rules.prepare_annotation.output,
     output:
-        hits="results/{genome}/hmmer_hits.bed",
+        hits="results/genomes/{genome}/hmmer_hits.bed",
     conda:
         "../env/csvtk.yaml"
     shell:
@@ -45,10 +45,10 @@ rule hmmer_filter:
 rule match_tnp:
     input:
         genes=rules.hmmer_filter.output,
-        fasta="results/{genome}/translated_cds.faa",
+        fasta="results/genomes/{genome}/translated_cds.faa",
     output:
-        bed="results/{genome}/{tnp}.bed",
-        fasta="results/{genome}/{tnp}.faa",
+        bed="results/genomes/{genome}/{tnp}.bed",
+        fasta="results/genomes/{genome}/{tnp}.faa",
     params:
         motifs=lambda wildcards: config["params"]["pfam"]["rule"][wildcards.tnp],
     conda:
