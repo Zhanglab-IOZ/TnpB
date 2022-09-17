@@ -13,10 +13,10 @@ rule all:
 
 
 include: "rules/prepare_genome.smk"
-include: "rules/pfam_search.smk"
-include: "rules/tnpb_cluster.smk"
-include: "rules/build_consensus.smk"
+include: "rules/search_hmmer.smk"
+include: "rules/cluster_tnpb.smk"
 include: "rules/remove_duplicate.smk"
+include: "rules/build_consensus.smk"
 
 
 checkpoint link_genomes:
