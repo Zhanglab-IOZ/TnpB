@@ -47,9 +47,8 @@ rule summary_tnpb:
                 {{ csvtk -tH join --left-join - {input.tnpb_cluster:q} -f "4;2" || true; }} |
                 tee {output.details:q} |
                 {{ csvtk -tH summary -g 9 -f '4:count,4:collapse,8:sum' --separater ' ' --decimal-width 0 || true; }} |
-                cut -f 1,2,4,3 |
                 awk -v "FS=\t" -v 'OFS=\t' '{{
-                    print $1, $2, $3, ($3>1)?"T":"F", $4
+                    print $1, $2, $4, ($4>1)?"T":"F", $3
                 }}' > {output.summary:q}
         """)
 
