@@ -3,36 +3,30 @@ configfile: "config/config.yaml"
 import os
 import textwrap
 
-rule all:
-    input:
-        lambda wildcards: expand(
-            "results/elements/{tnpb}/mafft.fna",
-            tnpb=glob_wildcards(os.path.join(checkpoints.link_genomes.get().output.outdir, "{tnpb}/flanking"), followlinks=True).tnpb
-        ),
-        "results/dedup/merged_rep_seq.fasta",
-
 
 include: "rules/prepare_genome.smk"
 include: "rules/search_hmmer.smk"
 include: "rules/cluster_tnpb.smk"
-include: "rules/remove_duplicate.smk"
-include: "rules/build_consensus.smk"
+# include: "rules/remove_duplicate.smk"
+# include: "rules/build_consensus.smk"
 
 
-checkpoint link_genomes:
+rule get_elements:
     input:
-        meta = expand("results/genomes/{genome}/summary.tsv", genome = config["input"]["genomes"].keys()),
+        filtered=expand("results/genomes/{genome}/multi_copy", genome = config["input"]["genomes"].keys()),
         flanking = expand("results/genomes/{genome}/flanking", genome = config["input"]["genomes"].keys()),
     output:
-        outdir=directory("results/genome_links")
+        outdir=directory("results/elements_list")
     params:
-        genomes = expand("results/genomes/{genome}", genome = config["input"]["genomes"].keys()),
-    run:
-        os.makedirs(f"{output.outdir}", exist_ok=True)
-        for meta, genome in zip(input.meta, params.genomes):
-            with open(meta, "r") as df:
-                for line in df:
-                    tnpb, n_copy, n_tnpa, passed, _ = line.rstrip("\n").split("\t")
-                    if passed != "T":
-                        continue
-                    os.symlink(os.path.relpath(genome, start=f"{output.outdir}"), f"{output.outdir}/{tnpb}")
+        genomes = list(config["input"]["genomes"].keys()),
+    shell:
+        textwrap.dedent(r"""
+        mkdir -p {output.outdir:q}
+
+        for genome in {params.genomes:q}; do
+            for element in $(ls "results/genomes/${{genome}}/multi_copy/"); do
+                ln -s ../genomes/${{genome}} {output.outdir:q}/${{element%.faa}}
+            done
+        done
+        """)
+

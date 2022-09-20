@@ -59,11 +59,15 @@ rule filter_multi_copy:
         fasta="results/genomes/{genome}/tnpb.faa",
         summary="results/genomes/{genome}/summary.tsv",
     output:
-        filtered="results/genomes/{genome}/multi_copy.faa",
+        filtered=directory("results/genomes/{genome}/multi_copy"),
     conda:
         "../env/seqkit.yaml"
     shell:
-        r""" cat {input.summary:q} | awk -v 'FS=\t' '$4=="T"{{print $1}}' | seqkit grep -f - {input.fasta:q} -o {output.filtered:q} """
+        r"""
+            mkdir -p {output:q}
+            cat {input.summary:q} | awk -v 'FS=\t' '$4=="T"{{print $1}}' | seqkit grep -f - {input.fasta:q} |
+            awk -v 'out='{output.filtered:q} '/^>/{{name = substr($0, 2); file = out "/" name ".faa"}} {{print > file}}'
+        """
 
 
 rule extract_flanking:
