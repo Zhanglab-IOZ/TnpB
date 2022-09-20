@@ -90,3 +90,23 @@ rule extract_flanking:
                 print $10 >(prefix "/" $9 ".fna")
             }}'
         """)
+
+
+rule list_elements:
+    input:
+        filtered=expand("results/genomes/{genome}/multi_copy", genome = config["input"]["genomes"].keys()),
+        flanking = expand("results/genomes/{genome}/flanking", genome = config["input"]["genomes"].keys()),
+    output:
+        outdir=directory("results/elements_list")
+    params:
+        genomes = list(config["input"]["genomes"].keys()),
+    shell:
+        textwrap.dedent(r"""
+        mkdir -p {output.outdir:q}
+
+        for genome in {params.genomes:q}; do
+            for element in $(ls "results/genomes/${{genome}}/multi_copy/"); do
+                ln -s ../genomes/${{genome}} {output.outdir:q}/${{element%.faa}}
+            done
+        done
+        """)
