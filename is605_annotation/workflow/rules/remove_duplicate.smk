@@ -36,9 +36,13 @@ rule cluster_tnpb_cross_genome:
     threads: 8
     shell:
         textwrap.dedent(r"""
-            tmpd=$(mktemp -d -t --dry-run mmseq_XXXXXXXX)
-            mmseqs easy-cluster {input:q} {params.prefix:q} $tmpd --min-seq-id {params.identity} -c {params.coverage} --threads {threads} > {log.mmseqs2:q}
-            rm -r $tmpd
+            if [ -s {input.fasta:q} ]; then
+                tmpd=$(mktemp -d -t --dry-run mmseq_XXXXXXXX)
+                mmseqs easy-cluster {input.fasta:q} {params.prefix:q} $tmpd --min-seq-id {params.identity} -c {params.coverage} --threads {threads} > {log.mmseqs2:q}
+                rm -r $tmpd
+            else
+                touch {output:q}
+            fi
         """)
 
 
