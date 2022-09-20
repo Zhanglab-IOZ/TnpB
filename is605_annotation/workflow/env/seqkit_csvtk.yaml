@@ -1,0 +1,7 @@
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - seqkit=2.2.0
+  - csvtk=0.23.0
