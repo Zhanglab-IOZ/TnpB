@@ -8,7 +8,7 @@ import textwrap
 rule hmmer_search:
     input:
         fasta="results/genomes/{genome}/translated_cds.faa",
-        profile=config["params"]["pfam"]["models"],
+        profile=config["domain_search"]["models"],
     output:
         domtblout="results/genomes/{genome}/hmmer.txt",
     log:
@@ -52,7 +52,7 @@ rule match_tnp:
     wildcard_constraints:
         tnp="tnp[ab]"
     params:
-        motifs=lambda wildcards: config["params"]["pfam"]["rule"][wildcards.tnp],
+        motifs=lambda wildcards: config["domain_search"]["rule"][wildcards.tnp],
     conda:
         "../env/seqkit.yaml"
     shell:

@@ -7,7 +7,7 @@ rule merge_tnpb:
             "results/elements_list/{tnpb}/multi_copy/{tnpb}.faa",
             tnpb=glob_wildcards("results/elements_list/{tnpb}/flanking", followlinks=True).tnpb
         ),
-        known_seqs = "/dev/null"
+        known_seqs = config["dedup"]["known_seqs"]
     output:
         merged = "results/dedup/merged_tnpb.faa",
     shell:
@@ -29,8 +29,8 @@ rule cluster_tnpb_cross_genome:
         mmseqs2="results/dedup/merged_mmseqs.log",
     params:
         prefix="results/dedup/merged",
-        identity=0.85,
-        coverage=0.9,
+        identity=config["dedup"]["identity"],
+        coverage=config["dedup"]["coverage"],
     conda:
         "../env/mmseqs2.yaml"
     threads: 8
@@ -49,7 +49,7 @@ rule cluster_tnpb_cross_genome:
 rule filter_known_candidates:
     input:
         table="results/dedup/merged_cluster.tsv",
-        known_seqs = "/dev/null",
+        known_seqs = config["dedup"]["known_seqs"],
         rep_seqs="results/dedup/merged_rep_seq.fasta",
     output:
         new_seqs = "results/dedup/candidates.faa",
@@ -57,10 +57,10 @@ rule filter_known_candidates:
         "../env/seqkit_csvtk.yaml"
     shell:
         r"""
-            seqkit seq -n {input.known_seqs:q} |
+            seqkit seq -ni {input.known_seqs:q} |
                 {{ csvtk -tH grep -f 2 -P - {input.table:q} || echo '#'; }} |
                 cut -f 1 | sort -u |
                 {{ csvtk -tH grep -f 1 -P - -v {input.table:q} || true; }} |
-                cut -f 1 |
+                cut -f 1 | sort -u |
                 seqkit grep -f - {input.rep_seqs:q} > {output.new_seqs:q}
         """

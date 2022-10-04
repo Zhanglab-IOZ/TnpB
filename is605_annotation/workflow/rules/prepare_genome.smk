@@ -3,7 +3,7 @@ import textwrap
 
 rule prepare_genome:
     input:
-        archive=lambda wildcards: config["input"]["genomes"][wildcards.genome].format(suffix = wildcards.suffix),
+        archive=lambda wildcards: config["genomes"][wildcards.genome].format(suffix = wildcards.suffix),
     output:
         extracted=temp("results/genomes/{genome}/{suffix}"),
     wildcard_constraints:

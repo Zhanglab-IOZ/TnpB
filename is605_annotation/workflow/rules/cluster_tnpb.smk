@@ -12,8 +12,8 @@ rule cluster_tnpb_within_genome:
         mmseqs2="results/genomes/{genome}/tnpb_mmseqs.log",
     params:
         prefix="results/genomes/{genome}/tnpb",
-        identity=0.9,
-        coverage=0.9,
+        identity=config["clustering"]["identity"],
+        coverage=config["clustering"]["coverage"],
     conda:
         "../env/mmseqs2.yaml"
     threads: 8
@@ -94,12 +94,12 @@ rule extract_flanking:
 
 rule list_elements:
     input:
-        filtered=expand("results/genomes/{genome}/multi_copy", genome = config["input"]["genomes"].keys()),
-        flanking = expand("results/genomes/{genome}/flanking", genome = config["input"]["genomes"].keys()),
+        filtered=expand("results/genomes/{genome}/multi_copy", genome = config["genomes"].keys()),
+        flanking = expand("results/genomes/{genome}/flanking", genome = config["genomes"].keys()),
     output:
         outdir=directory("results/elements_list")
     params:
-        genomes = list(config["input"]["genomes"].keys()),
+        genomes = list(config["genomes"].keys()),
     shell:
         textwrap.dedent(r"""
         mkdir -p {output.outdir:q}
