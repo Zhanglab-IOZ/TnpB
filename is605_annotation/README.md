@@ -76,14 +76,15 @@ If you use different genome files or want to filter known elements, change the c
 ### Workflow execution
 
 The workflow contains two parts. First, multicopy IS605 elements are annotated in seperate genomes by `do_genomes`:
+
 ```bash
-snakemake --use-conda do_genomes
+snakemake --use-conda --cores all do_genomes
 ```
 
 And these elements are clustered to remove redundancy. Also, different copys are aligned to facilitate annotation of element margin. These are performed by `do_elements`:
 
 ```bash
-snakemake --use-conda do_elements
+snakemake --use-conda --cores all --cores 20 do_elements
 ```
 
 ### Result files
