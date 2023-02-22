@@ -84,7 +84,7 @@ snakemake --use-conda --cores all do_genomes
 And these elements are clustered to remove redundancy. Also, different copys are aligned to facilitate annotation of element margin. These are performed by `do_elements`:
 
 ```bash
-snakemake --use-conda --cores all --cores 20 do_elements
+snakemake --use-conda --cores all do_elements
 ```
 
 ### Result files
