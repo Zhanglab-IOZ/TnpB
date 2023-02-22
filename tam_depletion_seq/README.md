@@ -17,3 +17,46 @@ graph LR
 
 Identify depleted TAM from seqeuencing data and build the sequence logo.
 
+## Quick start guide
+
+### Get the workflow
+
+Clone this repo and set the working directory:
+
+```bash
+git clone https://github.com/Zhanglab-IOZ/TnpB.git
+cd TnpB/tam_depletion_seq
+```
+
+### Prepare sequencing data
+
+```bash
+mkdir -p resources
+```
+
+Download the following files to the `resources/` folder:
+
+- `NC_R1.fq.gz`, `NC_R2.fq.gz`: The control group.
+- `ISHahl1_R1.fq.gz`, `ISHahl1_R2.fq.gz` and `ISTfu1_R1.fq.gz`, `ISTfu1_R2.fq.gz`: The 2 test groups.
+
+### Create config file
+
+Create the config file config/config.yaml using the template file:
+
+```bash
+cp config/config_example.yaml config/config.yaml
+```
+
+Edit the config file accordingly if different data files are used.
+
+### Execute the workflow
+
+Run the workflow with snakemake:
+
+```bash
+snakemake --use-conda --cores all
+```
+
+### Result files
+
+The resulting TAM logo is avaliable as `results/logo/*.logo.svg`.
