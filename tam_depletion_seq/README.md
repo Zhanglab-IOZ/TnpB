@@ -36,8 +36,8 @@ mkdir -p resources
 
 Download the following files to the `resources/` folder:
 
-- `NC_R1.fq.gz`, `NC_R2.fq.gz`: The control group.
-- `ISHahl1_R1.fq.gz`, `ISHahl1_R2.fq.gz` and `ISTfu1_R1.fq.gz`, `ISTfu1_R2.fq.gz`: The 2 test groups.
+- `TAM_NC_R1.fq.gz`, `TAM_NC_R2.fq.gz`: The control group.
+- `TAM_ISHahl1_R1.fq.gz`, `TAM_ISHahl1_R2.fq.gz` and `TAM_ISTfu1_R1.fq.gz`, `TAM_ISTfu1_R2.fq.gz`: The 2 test groups.
 
 ### Create config file
 

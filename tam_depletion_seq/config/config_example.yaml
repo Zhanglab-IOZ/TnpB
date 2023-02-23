@@ -1,14 +1,14 @@
 # path to sequencing data, including control and test groups
 input:
   NC:
-    R1: resources/NC_R1.fq.gz
-    R2: resources/NC_R2.fq.gz
+    R1: resources/TAM_NC_R1.fq.gz
+    R2: resources/TAM_NC_R2.fq.gz
   ISHahl1:
-    R1: resources/ISHahl1_R1.fq.gz
-    R2: resources/ISHahl1_R2.fq.gz
+    R1: resources/TAM_ISHahl1_R1.fq.gz
+    R2: resources/TAM_ISHahl1_R2.fq.gz
   ISTfu1:
-    R1: resources/ISTfu1_R1.fq.gz
-    R2: resources/ISTfu1_R2.fq.gz
+    R1: resources/TAM_ISTfu1_R1.fq.gz
+    R2: resources/TAM_ISTfu1_R2.fq.gz
 
 # list of control and test group pairs
 samples:
