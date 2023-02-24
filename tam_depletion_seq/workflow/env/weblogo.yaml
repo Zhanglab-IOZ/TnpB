@@ -5,3 +5,4 @@ dependencies:
   - pandas=1.4
   - weblogo=3.7
   - ghostscript=9.54.0
+  - pdf2svg=0.2.3
