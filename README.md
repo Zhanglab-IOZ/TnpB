@@ -21,4 +21,6 @@ Detailed information on preparing input data and running the pipelines is availa
 
 ## Citation
 
-<!-- TODO -->
+To cite this repo in publications, please use
+
+> Xiang, G., Li, Y., Sun, J. *et al.* Evolutionary mining and functional characterization of TnpB nucleases identify efficient miniature genome editors. *Nat Biotechnol* (2023). https://doi.org/10.1038/s41587-023-01857-x

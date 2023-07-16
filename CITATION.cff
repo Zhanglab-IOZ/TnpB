@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: Please cite this repository using the metadata from "preferred-citation".
+authors:
+  - given-names: Yuanqing
+    family-names: Li
+    orcid: 'https://orcid.org/0000-0003-2083-4339'
+    affiliation: 'Institute of Zoology, CAS'
+title: Snakemake workflows for TAM depletion analysis and de novo IS605 annotation
+type: software
+version: 1.0.0
+doi: 10.5281/zenodo.7952678
+date-released: 2023-05-20
+repository-code: 'https://github.com/Zhanglab-IOZ/TnpB'
+
+preferred-citation:
+  type: article
+  authors:
+    - {given-names: Guanghai, family-names: Xiang, orcid: 'https://orcid.org/0000-0002-3495-1862'}
+    - {given-names: Yuanqing, family-names: Li, orcid: 'https://orcid.org/0000-0003-2083-4339'}
+    - {given-names: Jing, family-names: Sun}
+    - {given-names: Yongyuan, family-names: Huo}
+    - {given-names: Shiwei, family-names: Cao}
+    - {given-names: Yuanwei, family-names: Cao}
+    - {given-names: Yanyan, family-names: Guo}
+    - {given-names: Ling, family-names: Yang}
+    - {given-names: Yujia, family-names: Cai}
+    - {given-names: Yong E., family-names: Zhang, orcid: 'https://orcid.org/0000-0003-3770-2383'}
+    - {given-names: Haoyi, family-names: Wang, orcid: 'https://orcid.org/0000-0003-2135-1769'}
+  year: 2023
+  month: 6
+  day: 29
+  title: Evolutionary mining and functional characterization of TnpB nucleases identify efficient miniature genome editors
+  journal: Nature Biotechnology
+  # issue: 1
+  # volume: 1
+  # start: 1 # First page number
+  # end: 10 # Last page number
+  doi: 10.1038/s41587-023-01857-x
+  
