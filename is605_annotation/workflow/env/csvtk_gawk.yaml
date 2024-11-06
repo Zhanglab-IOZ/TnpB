@@ -4,3 +4,4 @@ channels:
   - defaults
 dependencies:
   - csvtk=0.23.0
+  - gawk

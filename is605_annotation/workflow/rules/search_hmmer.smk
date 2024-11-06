@@ -27,11 +27,11 @@ rule hmmer_filter:
     output:
         hits="results/genomes/{genome}/hmmer_hits.bed",
     conda:
-        "../env/csvtk.yaml"
+        "../env/csvtk_gawk.yaml"
     shell:
         textwrap.dedent(r"""
         cat {input.hmmer:q} |
-            awk '!/^#/ && $7<0.001 && $12<0.001 {{
+            gawk '!/^#/ && $7<0.001 && $12<0.001 {{
                 match($0, /\[locus_tag=([^[:space:]]+)\]/, arr)
                 print arr[1] "\t" $4
             }}' |
